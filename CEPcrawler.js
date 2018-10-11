@@ -83,6 +83,7 @@ var fs = require('fs');
             else
                 console.log(listaCeps);
                 fs.writeFileSync('ceps/cepINSS.json', JSON.stringify(listaCeps));
+                console.log('finished');
             
         });  
     }
