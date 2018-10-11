@@ -68,17 +68,17 @@ var fs = require('fs');
                 if(result.msgErro === undefined){
                     var ceps = result.apsTO;
                     listaCeps.push(ceps);
-                    console.log(listaCeps);
+                    //console.log(listaCeps);
                 }
-                //*
+                /*
                 else{
-                    var ceps = result.msgErro;
+                    var ceps = result;
                     listaCeps.push(ceps);
                     //console.log(listaCeps);                    
                 }
                 //*/
             }
-            if(currCep != '00000010')
+            if(currCep != '99999999')
                 callback(); 
             else
                 console.log(listaCeps);
