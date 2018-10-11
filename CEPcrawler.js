@@ -23,8 +23,8 @@
 
     var pageToVisit = 'https://vip-pmeuinssprxr.inss.gov.br/apis/localizadorApsServices/buscaCep/';
     //console.log("Visiting page " + pageToVisit);
-    var currCep = '01000000';
-    var iterator = 0;
+    var currCep = '01000998';
+    var iterator = 998;
     var dezena = 10;
     var recuo = 1;
 
@@ -60,7 +60,8 @@
                 var result = JSON.parse($.text()).apsTO;
                 if(result.msgErro === undefined){
                     var ceps = result;
-                    listaCeps.push(ceps);
+                    if((listaCeps.length === 0) || (listaCeps[listaCeps.length - 1].cepFiltro === ceps.cepFiltro))
+                        listaCeps.push(ceps);
                     console.log(ceps);
                     fs.writeFileSync('ceps/cepINSS.json', JSON.stringify(listaCeps));
 
