@@ -33,6 +33,7 @@
             if ( cepList[inIterator + 1] ) {
                 currCep = cepList[++inIterator].cep;
             }else if(outIterator < 12){
+                console.log('trocou de bloco pra ' + (outIterator))
                 cepList = JSON.parse(fs.readFileSync('ceps/bloco_' + (outIterator++) + '.json'));
                 inIterator = 0;
                 currCep = cepList[inIterator].cep;
