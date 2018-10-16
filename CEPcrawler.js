@@ -26,7 +26,7 @@
     var cepList = JSON.parse(fs.readFileSync('ceps/bloco_1.json'));
     var currCep;
     var inIterator = -1;
-    var outIterator = 2;
+    var outIterator = 1;
 
     function iterateCEP(iterate){
         if (iterate){
@@ -39,11 +39,11 @@
                     inIterator = 0;
                     currCep = cepList[++inIterator].cep;
                 }
-            }else if(outIterator < 12){
-                console.log('trocou de bloco pra ' + (outIterator))
-                cepList = JSON.parse(fs.readFileSync('ceps/bloco_' + (outIterator++) + '.json'));
-                inIterator = 0;
+            }else if((outIterator + 1) < 12){
+                cepList = JSON.parse(fs.readFileSync('ceps/bloco_' + (++outIterator) + '.json'));
+                fs.appendFileSync('ceps/log.txt', 'trocou de bloco pra ' + (outIterator) + '\n');
                 try{
+                    inIterator = 0;
                     currCep = cepList[inIterator].cep;
                 }
                 catch(erro){

@@ -9,6 +9,7 @@ for i = 1, 11, 1 do
     local saida = io.open('ceps/bloco_'..i..'.json', 'w+');
     saida:write(JSON.stringify(input));
     saida:close();
+    input = nil;
 
 
 end
