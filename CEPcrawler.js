@@ -23,28 +23,30 @@
 
     var pageToVisit = 'https://vip-pmeuinssprxr.inss.gov.br/apis/localizadorApsServices/buscaCep/';
     //console.log("Visiting page " + pageToVisit);
-    var currCep = '01000000';
-    var iterator = 998;
-    var dezena = 10;
-    var recuo = 1;
+    var cepList = JSON.parse(fs.readFileSync('ceps/bloco_1.json'));
+    var currCep;
+    var inIterator = -1;
+    var outIterator = 2;
 
-    function iterateCEP(){
-        if(cepMode === '-sql-off'){
-            if (iterator < dezena){
-                currCep = currCep.slice(0, (currCep.length - recuo)) + iterator;
-                iterator += 1;
-            }else{
-                dezena *= 10;
-                recuo += 1;
-            }
-        }
-        else{
-            console.log('to be done');
-            return;
+    function iterateCEP(iterate){
+        if (iterate){
+            if ( cepList[inIterator + 1] ) {
+                currCep = cepList[++inIterator].cep;
+            }else if(outIterator < 12){
+                cepList = JSON.parse(fs.readFileSync('ceps/bloco_' + (outIterator++) + '.json'));
+                inIterator = 0;
+                currCep = cepList[inIterator].cep;
+            }    
         }
     }
 
-    var listaCeps = JSON.parse(fs.readFileSync('ceps/cepINSS.json')) ||  new Array;
+    try{
+        var listaCeps =  JSON.parse(fs.readFileSync('ceps/cepINSS.json'));
+     }
+     catch(err){
+        console.log(err);
+        var listaCeps = new Array;
+     }  
 
     function search(url, callback){
         request(url, function(error, response, body) {
@@ -54,38 +56,45 @@
             }
             // Check status code (200 is HTTP OK)
             //console.log("Status code: " + response.statusCode);
-            if(response.statusCode === 200) {
-                // Parse the document body
-                var $ = cheerio.load(body);
-                var result = JSON.parse($.text()).apsTO;
-                if(result.msgErro === undefined){
-                    var ceps = result;
-                    if((listaCeps.length === 0) || (listaCeps[listaCeps.length - 1].cepFiltro === ceps.cepFiltro))
-                        listaCeps.push(ceps);
-                    console.log(ceps);
-                    fs.writeFileSync('ceps/cepINSS.json', JSON.stringify(listaCeps));
+            if (response){
+                if(response.statusCode === 200) {
+                    // Parse the document body
+                    var $ = cheerio.load(body);
+                    var result = JSON.parse($.text()).apsTO;
+                    console.log(result);
+                    if(result.msgErro === undefined){
+                        var ceps = result;
+                        //console.log(ceps);
+                        if((listaCeps.length === 0) || (listaCeps[listaCeps.length - 1].codigo !== ceps.codigo)){
+                            listaCeps.push(ceps);
+                            //console.log(listaCeps);
+                            fs.writeFileSync('ceps/cepINSS.json', JSON.stringify(listaCeps));
+                        }      
 
+                    }
+                    /*
+                    else{
+                        var ceps = result;
+                        listaCeps.push(ceps);
+                        //console.log(listaCeps);                    
+                    }
+                    //*/
                 }
-                /*
+                if(currCep != '99999999')
+                    callback(true); 
                 else{
-                    var ceps = result;
-                    listaCeps.push(ceps);
-                    //console.log(listaCeps);                    
+                    console.log(listaCeps);
+                    fs.writeFileSync('ceps/cepINSS.json', JSON.stringify(listaCeps));
+                    console.log('finished');
                 }
-                //*/
-            }
-            if(currCep != '99999999')
-                callback(); 
-            else{
-                console.log(listaCeps);
-                fs.writeFileSync('ceps/cepINSS.json', JSON.stringify(listaCeps));
-                console.log('finished');
+            }else{
+                callback(false);
             }
         });  
     }
 
-    function crawl(){
-        iterateCEP();
+    function crawl(iterate){
+        iterateCEP(iterate);
         //currCep = '58052250'
         search(pageToVisit + currCep, crawl);
     }
