@@ -23,20 +23,34 @@
 
     var pageToVisit = 'https://vip-pmeuinssprxr.inss.gov.br/apis/localizadorApsServices/buscaCep/';
     //console.log("Visiting page " + pageToVisit);
-    var cepList = JSON.parse(fs.readFileSync('ceps/bloco_1.json'));
+    var cepList = JSON.parse(fs.readFileSync('ceps/bloco_7.json'));
     var currCep;
     var inIterator = -1;
-    var outIterator = 2;
+    var outIterator = 8;
 
     function iterateCEP(iterate){
         if (iterate){
-            if ( cepList[inIterator + 1] ) {
-                currCep = cepList[++inIterator].cep;
+            if ( cepList[inIterator + 1] || cepList[inIterator + 2]) {
+                try{
+                    currCep = cepList[++inIterator].cep;
+                }
+                catch(erro){
+                    console.log(erro);
+                    inIterator = 0;
+                    currCep = cepList[++inIterator].cep;
+                }
             }else if(outIterator < 12){
                 console.log('trocou de bloco pra ' + (outIterator))
                 cepList = JSON.parse(fs.readFileSync('ceps/bloco_' + (outIterator++) + '.json'));
                 inIterator = 0;
-                currCep = cepList[inIterator].cep;
+                try{
+                    currCep = cepList[inIterator].cep;
+                }
+                catch(erro){
+                    console.log(erro);
+                    inIterator = 1;
+                    currCep = cepList[inIterator].cep;
+                }
             }    
         }
     }
